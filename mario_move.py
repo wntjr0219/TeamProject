@@ -1,6 +1,5 @@
 from pico2d import *
 import random
-import monster_object
 # 마리오 움직임
 # 적절한 마리오 이미지가 없으므로 애니메이션시트로 대체
 # 추후 마리오로 이미지교체예정
@@ -23,8 +22,9 @@ class Mario:
         self.frame = (self.frame + 1) % 8 
         # self.frame = (self.frame + 1) % 7 
         self.x += x_dir*5
-        self.y += y_dir*5
-        if (self.y < ground):
+        if self.y >= ground:
+            self.y += y_dir*5
+        if self.y < ground:
             self.y = ground
 
     def draw(self): 
@@ -97,14 +97,12 @@ while running:
 
     update_canvas()
     mario.update()
-    monster_object.goomba.update()
     clear_canvas()
 
     grass.draw()
     handle_events()
 
     mario.draw()
-    monster_object.goomba.draw()
 
    
     delay(0.03)
