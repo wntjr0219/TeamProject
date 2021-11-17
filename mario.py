@@ -1,6 +1,9 @@
 import game_framework
 from pico2d import *
 import random
+from fire_ball import Fire_Ball
+import game_world
+
 # 마리오 클래스로 교체
 # 적절한 마리오 이미지가 없으므로 애니메이션시트로 대체
 # 추후 마리오로 이미지교체예정
@@ -12,24 +15,24 @@ RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS* PIXEL_PER_METER)
 
+# 마리오 프레임 설정
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-FRAMES_PER_ACTION = 8
+FRAMES_PER_ACTION = 8  # 현재 마리오 프레임 
 
 
 
-# Boy Event
-RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SPACE = range(5)
+RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, CTRL,  = range(5)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_RIGHT): RIGHT_DOWN,
     (SDL_KEYDOWN, SDLK_LEFT): LEFT_DOWN,
     (SDL_KEYUP, SDLK_RIGHT): RIGHT_UP,
     (SDL_KEYUP, SDLK_LEFT): LEFT_UP,
-    (SDL_KEYDOWN, SDLK_SPACE): SPACE
+    (SDL_KEYDOWN, SDLK_LCTRL): CTRL,
+    (SDL_KEYDOWN, SDLK_RCTRL): CTRL
 }
 
-# Boy States
 
 class IdleState:
 
@@ -44,7 +47,7 @@ class IdleState:
             mario.velocity += RUN_SPEED_PPS
 
     def exit(mario, event):
-        if event == SPACE:
+        if event == CTRL:
             mario.fire_ball()
         pass
 
@@ -72,7 +75,7 @@ class RunState:
        mario.dir = clamp(-1, mario.velocity, 1)
            
     def exit(mario, event):
-        if event == SPACE:
+        if event == CTRL:
             mario.fire_ball()
 
     def do(mario):
@@ -93,15 +96,18 @@ class RunState:
 
 
 next_state_table = {
-    IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, SPACE: IdleState},
-    RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState, SPACE: RunState},
+    IdleState: {RIGHT_UP: RunState, LEFT_UP: RunState, RIGHT_DOWN: RunState, LEFT_DOWN: RunState, CTRL: IdleState},
+    RunState: {RIGHT_UP: IdleState, LEFT_UP: IdleState, LEFT_DOWN: IdleState, RIGHT_DOWN: IdleState, CTRL: RunState},
    
 }
 
+
 class Mario:
+
     def __init__(self):
         self.x, self.y = 200, 90
         self.image = load_image('animation_sheet.png')
+        # self.image = load_image('mario1.png')
 
         self.dir = 1
         self.velocity = 0
@@ -112,7 +118,11 @@ class Mario:
 
 
     def fire_ball(self):
-        pass
+        fire_ball = Fire_Ball(self.x, self.y, self. dir)
+        game_world.add_object(fire_ball, 1)
+
+    
+
 
     def add_event(self, event):
         self.event_que.insert(0, event)
@@ -127,8 +137,9 @@ class Mario:
 
     def draw(self):
         self.cur_state.draw(self)
-
+    
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:
             key_event = key_event_table[(event.type, event.key)]
             self.add_event(key_event)
+

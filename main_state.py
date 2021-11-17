@@ -6,18 +6,23 @@ from pico2d import *
 import game_framework
 import game_world
 
+# 오브젝트
 from grass import Grass
 from mario import Mario
 from monster_object import Monster
+from fire_ball import Fire_Ball
 
 
 
 name = "MainState"
 
+
 mario = None
+monster = None
 
 def enter():
-    global mario
+    global mario, monster
+
     mario = Mario()
     grass = Grass()
     monster = Monster()
