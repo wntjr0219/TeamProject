@@ -25,7 +25,7 @@ def enter():
 
     mario = Mario()
     grass = Grass()
-    monster = Monster()
+    monster = Monster() 
     game_world.add_object(grass, 0)
     game_world.add_object(mario, 1)
     game_world.add_object(monster, 1)

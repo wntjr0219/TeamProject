@@ -1,6 +1,5 @@
 import game_framework
 from pico2d import *
-import random
 from fire_ball import Fire_Ball
 import game_world
 
